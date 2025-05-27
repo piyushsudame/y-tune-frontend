@@ -1,103 +1,127 @@
+"use client"
 import Image from "next/image";
+import Link from "next/link";
+import Footer from "@/components/Footer";
+import { useSession } from "next-auth/react"
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.js
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const { data: session, status } = useSession()
+  const router = useRouter();
+  const [isFirstLoad, setIsFirstLoad] = useState(true);
+  
+  useEffect(() => {
+    // Check if we should force stay on homepage (from navbar click)
+    const urlParams = new URLSearchParams(window.location.search);
+    const forceHomepage = urlParams.get('force') === 'true';
+    
+    // Only redirect if authenticated, not forcing homepage, and on first load
+    if (status === "authenticated" && !forceHomepage && isFirstLoad) {
+      const referrer = document.referrer;
+      const currentHost = window.location.host;
+      
+      // Check if referrer is empty (direct access) or from external site
+      if (!referrer || !referrer.includes(currentHost)) {
+        router.push("/player");
+      }
+      
+      // Mark as no longer first load
+      setIsFirstLoad(false);
+    }
+  }, [status, router, isFirstLoad]);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
+  return (
+      <> 
+            <main className="flex flex-col min-h-[calc(100vh-7rem)]">
+        {/* Hero Section */}
+        <section className="flex flex-col md:flex-row items-center justify-between px-6 md:px-16 py-16 md:py-24">
+          <div className="md:w-1/2 space-y-6 text-center md:text-left">
+            <h1 className="text-4xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-purple-400">
+              Your Music, Your Way
+            </h1>
+            <p className="text-lg md:text-xl text-gray-300 max-w-xl">
+              YTune gives you unlimited access to music and podcasts with no ads.
+              Create playlists, discover new tracks, and enjoy your favorite tunes anytime.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start pt-4">
+              <Link href={"/signup"} >
+              <button className="px-8 py-3 bg-gradient-to-r from-purple-600 to-indigo-700 rounded-full font-medium text-white hover:opacity-90 transition-all">
+                Get Started
+              </button>
+              </Link>
+              <Link href={"/about"}>
+              <button className="px-8 py-3 bg-transparent border border-purple-500 rounded-full font-medium text-white hover:bg-purple-900/20 transition-all">
+                Learn More
+              </button>
+              </Link>
+            </div>
+          </div>
+          <div className="md:w-1/2 mt-12 md:mt-0 flex justify-center">
+            <div className="relative w-72 h-72 md:w-96 md:h-96">
+              <Image 
+                src="/logo1.png" 
+                alt="YTune Music Player" 
+                fill
+                className="object-contain drop-shadow-[0_0_25px_rgba(139,92,246,0.5)]"
+                priority
+              />
+            </div>
+          </div>
+        </section>
+
+        {/* Features Section */}
+        <section className="px-6 md:px-16 py-16 bg-black/30 backdrop-blur-sm">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-16">
+            Why Choose <span className="text-purple-500">YTune</span>
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="bg-gradient-to-br from-slate-900/80 to-purple-900/20 p-8 rounded-xl border border-purple-900/30 backdrop-blur-sm">
+              <div className="w-14 h-14 bg-purple-700/30 rounded-full flex items-center justify-center mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold mb-3">Unlimited Music</h3>
+              <p className="text-gray-400">Access millions of songs from around the world without any limitations.</p>
+            </div>
+            
+            <div className="bg-gradient-to-br from-slate-900/80 to-purple-900/20 p-8 rounded-xl border border-purple-900/30 backdrop-blur-sm">
+              <div className="w-14 h-14 bg-purple-700/30 rounded-full flex items-center justify-center mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold mb-3">Custom Playlists</h3>
+              <p className="text-gray-400">Create and customize your own playlists with your favorite tracks and share them with friends.</p>
+            </div>
+            
+            <div className="bg-gradient-to-br from-slate-900/80 to-purple-900/20 p-8 rounded-xl border border-purple-900/30 backdrop-blur-sm">
+              <div className="w-14 h-14 bg-purple-700/30 rounded-full flex items-center justify-center mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold mb-3">Social Experience</h3>
+              <p className="text-gray-400">Connect with friends, share your favorite music, and discover what others are listening to.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* Call to Action */}
+        <section className="px-6 md:px-16 py-16 md:py-24 flex flex-col items-center justify-center text-center flex-grow">
+          <h2 className="text-3xl md:text-4xl font-bold mb-6 max-w-2xl">
+            Ready to experience the best music streaming platform?
+          </h2>
+          <p className="text-lg text-gray-300 mb-8 max-w-2xl">
+            Join thousands of music lovers who have already made YTune their go-to music player.
+          </p>
+          <button className="px-8 py-3 bg-gradient-to-r from-purple-600 to-indigo-700 rounded-full font-medium text-white hover:opacity-90 transition-all text-lg">
+            Start Listening Now
+          </button>
+        </section>
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+      <Footer />
+    </>        
   );
 }
