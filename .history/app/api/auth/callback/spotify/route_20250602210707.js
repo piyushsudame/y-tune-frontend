@@ -5,7 +5,7 @@ export async function GET(request) {
   const code = searchParams.get('code');
   
   if (!code) {
-    return NextResponse.redirect(new URL('/account', request.url));
+    return NextResponse.json({ error: 'No code provided' }, { status: 400 });
   }
 
   try {
@@ -26,12 +26,8 @@ export async function GET(request) {
 
     const data = await tokenResponse.json();
     
-    if (!tokenResponse.ok) {
-      throw new Error(data.error_description || 'Failed to get access token');
-    }
-
-    // Create response with redirect
-    const response = NextResponse.redirect(new URL('/account', request.url));
+    // Create response with tokens
+    const response = NextResponse.json(data);
     
     // Set access token cookie (1 hour)
     response.cookies.set('spotify_access_token', data.access_token, {
@@ -51,7 +47,6 @@ export async function GET(request) {
     
     return response;
   } catch (error) {
-    console.error('Spotify auth error:', error);
-    return NextResponse.redirect(new URL('/account', request.url));
+    return NextResponse.json({ error: 'Failed to get access token' }, { status: 500 });
   }
 } 
