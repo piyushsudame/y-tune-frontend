@@ -10,7 +10,7 @@ const AccountSettings = () => {
       <div className="flex-grow flex flex-col items-center justify-center">
         <h1 className="text-3xl font-bold text-white mb-6">Manage Your Account</h1>
         <p className="text-gray-300 mb-8">Click the button below to view and edit your profile, security, and connected accounts.</p>
-        <div className='flex flex-col gap-5 items-center justify-center'>
+        <div className='flex flex-col gap-4'>
           <UserButton afterSignOutUrl="/" appearance={{ elements: { avatarBox: 'w-32 h-32' } }} />
           <SpotifyAccountButton />
         </div>
