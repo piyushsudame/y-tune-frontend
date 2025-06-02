@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 
 export async function GET() {
   const clientId = process.env.SPOTIFY_CLIENT_ID;
-  const redirectUri = 'https://y-tune-frontend.vercel.app/api/auth/callback/spotify';
+  const redirectUri = 'https://localhost:3000/api/auth/callback/spotify';
   const scope = 'user-read-private user-read-email user-library-read user-top-read playlist-read-private playlist-read-collaborative';
 
   const authUrl = new URL('https://accounts.spotify.com/authorize');

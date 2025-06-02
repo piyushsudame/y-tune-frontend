@@ -20,7 +20,7 @@ export async function GET(request) {
       body: new URLSearchParams({
         grant_type: 'authorization_code',
         code,
-        redirect_uri: 'https://y-tune-frontend.vercel.app/api/auth/callback/spotify',
+        redirect_uri: 'https://localhost:3000/api/auth/callback/spotify',
       }),
     });
 
