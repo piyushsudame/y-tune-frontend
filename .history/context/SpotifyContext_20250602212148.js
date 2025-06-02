@@ -24,7 +24,7 @@ export function SpotifyProvider({ children }) {
 
   const loginToSpotify = () => {
     // Make sure we're using the correct environment variable
-    const clientId = process.env.SPOTIFY_CLIENT_ID;
+    const clientId = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID;
     if (!clientId) {
       console.error('Spotify Client ID is not defined');
       return;
