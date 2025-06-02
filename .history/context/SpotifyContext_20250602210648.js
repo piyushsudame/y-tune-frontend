@@ -7,6 +7,7 @@ const SpotifyContext = createContext();
 export function SpotifyProvider({ children }) {
   const [spotifyToken, setSpotifyToken] = useState(null);
   const [isSpotifyAuthenticated, setIsSpotifyAuthenticated] = useState(false);
+  const [spotifyUser, setSpotifyUser] = useState(null);
 
   const loginToSpotify = async () => {
     try {
@@ -21,6 +22,7 @@ export function SpotifyProvider({ children }) {
   const logoutSpotify = () => {
     setSpotifyToken(null);
     setIsSpotifyAuthenticated(false);
+    setSpotifyUser(null);
     // Remove both tokens
     document.cookie = 'spotify_access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
     document.cookie = 'spotify_refresh_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
@@ -46,6 +48,25 @@ export function SpotifyProvider({ children }) {
     }
   };
 
+  const fetchSpotifyUser = async (token) => {
+    try {
+      const response = await fetch('https://api.spotify.com/v1/me', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch user data');
+      }
+      
+      const userData = await response.json();
+      setSpotifyUser(userData);
+    } catch (error) {
+      console.error('Failed to fetch Spotify user:', error);
+    }
+  };
+
   const handleSpotifyCallback = async (code) => {
     try {
       const response = await fetch(`/api/auth/callback/spotify?code=${code}`);
@@ -54,6 +75,7 @@ export function SpotifyProvider({ children }) {
       if (data.access_token) {
         setSpotifyToken(data.access_token);
         setIsSpotifyAuthenticated(true);
+        await fetchSpotifyUser(data.access_token);
       }
     } catch (error) {
       console.error('Failed to complete Spotify authentication:', error);
@@ -86,10 +108,12 @@ export function SpotifyProvider({ children }) {
           if (newToken) {
             setSpotifyToken(newToken);
             setIsSpotifyAuthenticated(true);
+            await fetchSpotifyUser(newToken);
           }
         } else {
           setSpotifyToken(accessToken);
           setIsSpotifyAuthenticated(true);
+          await fetchSpotifyUser(accessToken);
         }
       }
     };
@@ -107,6 +131,7 @@ export function SpotifyProvider({ children }) {
       value={{
         spotifyToken,
         isSpotifyAuthenticated,
+        spotifyUser,
         loginToSpotify,
         logoutSpotify,
         handleSpotifyCallback,
