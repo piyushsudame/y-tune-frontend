@@ -20,7 +20,7 @@ export default function SpotifyButton() {
   }, []);
 
   if (!isSpotifyAuthenticated) {
-    console.log('isSpotifyAuthenticated', isSpotifyAuthenticated);
+    conso
     return (
       <button 
         onClick={loginToSpotify}
