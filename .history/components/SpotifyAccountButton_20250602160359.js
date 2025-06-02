@@ -10,7 +10,7 @@ export default function SpotifyAccountButton() {
       {!isSpotifyAuthenticated ? (
         <button 
           onClick={loginToSpotify}
-          className="px-8 py-3 bg-gradient-to-r from-green-600 to-[green] rounded-full font-medium text-white hover:opacity-90 transition-all"
+          className="px-8 py-3 bg-gradient-to-r from-green-600 to-[] rounded-full font-medium text-white hover:opacity-90 transition-all"
         >
           Connect Spotify Account
         </button>
