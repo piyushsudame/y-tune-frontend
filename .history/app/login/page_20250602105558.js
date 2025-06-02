@@ -3,10 +3,10 @@ import React, { useEffect, useState } from 'react'
 import Link from "next/link"
 import Footer from '@/components/Footer'
 import { useRouter } from "next/navigation"
-import { useSession, signIn } from "next-auth/react"
+import { useSignIn } from "@clerk/nextjs"
 
 const Login = () => {
-  const { data: session, status } = useSession() 
+  const { signIn, isLoaded } = useSignIn()
   const router = useRouter()
   const [formData, setFormData] = useState({
     email: '',
@@ -14,12 +14,6 @@ const Login = () => {
   })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-
-  useEffect(() => {
-    if (status === "authenticated") {
-      router.push("/player")
-    }
-  }, [status, router])
 
   const handleChange = (e) => {
     const { id, value } = e.target
@@ -42,39 +36,18 @@ const Login = () => {
     }
 
     try {
-      const result = await signIn('credentials', {
-        email: formData.email,
+      const result = await signIn.create({
+        identifier: formData.email,
         password: formData.password,
-        redirect: false,
       })
 
-      if (result?.error) {
-        // Check if this might be a social login account
-        try {
-          await fetch('/api/auth/check-social-account', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ email: formData.email }),
-          })
-          .then(res => res.json())
-          .then(data => {
-            if (data.isSocialAccount) {
-              setError(`This email is registered with ${data.provider}. Please use the "${data.provider}" login button below.`)
-            } else {
-              setError('Invalid email or password')
-            }
-          })
-        } catch (checkErr) {
-          // If the check fails, show the generic error
-          setError('Invalid email or password')
-        }
+      if (result.status === "complete") {
+        router.push("/player")
       } else {
-        // Redirect will happen automatically via the useEffect
+        setError('Invalid email or password')
       }
     } catch (err) {
-      setError('An error occurred during login')
+      setError('Invalid email or password')
       console.error(err)
     } finally {
       setLoading(false)

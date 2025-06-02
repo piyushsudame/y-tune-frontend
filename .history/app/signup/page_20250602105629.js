@@ -3,10 +3,10 @@ import React, { useEffect, useState } from 'react'
 import Link from "next/link"
 import Footer from '@/components/Footer'
 import { useRouter } from "next/navigation"
-import { useSession, signIn } from "next-auth/react"
+import { useSignUp } from "@clerk/nextjs"
 
 const Signup = () => {
-  const { data: session, status } = useSession() 
+  const { signUp, isLoaded } = useSignUp()
   const router = useRouter()
   const [formData, setFormData] = useState({
     name: '',
@@ -17,12 +17,6 @@ const Signup = () => {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
-
-  useEffect(() => {
-    if (status === "authenticated") {
-      router.push("/player")
-    }
-  }, [status, router])
 
   const handleChange = (e) => {
     const { id, value, type, checked } = e.target
@@ -57,52 +51,24 @@ const Signup = () => {
     }
 
     try {
-      // Register the user
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          password: formData.password,
-        }),
-      })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to register')
-      }
-
-      // Registration successful
-      setSuccess(true)
-      
-      // If this was a social login account that we've now linked with a password
-      if (data.message && data.message.includes('linked')) {
-        setSuccess(true)
-      }
-      
-      // Sign in the user
-      const result = await signIn('credentials', {
-        email: formData.email,
+      const result = await signUp.create({
+        emailAddress: formData.email,
         password: formData.password,
-        redirect: false,
+        firstName: formData.name.split(' ')[0],
+        lastName: formData.name.split(' ').slice(1).join(' '),
       })
 
-      if (result?.error) {
-        setError('Registration successful, but failed to log in automatically. Please log in manually.')
-      } else {
-        // Redirect to player page
+      if (result.status === "complete") {
+        setSuccess(true)
         router.push('/player')
+      } else {
+        setError('Failed to create account')
       }
     } catch (err) {
-      // Check if this is a social login account
-      if (err.message === 'User with this email already exists') {
-        setError('This email is already registered. Please try logging in with Google or GitHub, or use a different email.')
+      if (err.errors?.[0]?.message?.includes('already exists')) {
+        setError('This email is already registered. Please try logging in or use a different email.')
       } else {
-        setError(err.message)
+        setError(err.errors?.[0]?.message || 'Failed to create account')
       }
     } finally {
       setLoading(false)
@@ -224,7 +190,13 @@ const Signup = () => {
           <div className="flex flex-col gap-4 w-full max-w-md">
             {/* Google */}
             <button 
-              onClick={() => signIn("google", { callbackUrl: '/player' })} 
+              onClick={() => signUp.create({
+                emailAddress: formData.email,
+                password: formData.password,
+                firstName: formData.name.split(' ')[0],
+                lastName: formData.name.split(' ').slice(1).join(' '),
+                provider: 'google'
+              })} 
               className="flex justify-center items-center bg-white border border-gray-300 rounded-lg shadow-md w-full px-6 py-3 text-sm font-medium text-gray-800 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
             >
               <svg className="h-6 w-6 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="-0.5 0 48 48">
@@ -240,7 +212,13 @@ const Signup = () => {
 
             {/* Github */}
             <button 
-              onClick={() => signIn("github", { callbackUrl: '/player' })} 
+              onClick={() => signUp.create({
+                emailAddress: formData.email,
+                password: formData.password,
+                firstName: formData.name.split(' ')[0],
+                lastName: formData.name.split(' ').slice(1).join(' '),
+                provider: 'github'
+              })} 
               className="flex justify-center items-center bg-white border border-gray-300 rounded-lg shadow-md w-full px-6 py-3 text-sm font-medium text-gray-800 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
             >
               <svg className="h-6 w-6 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">

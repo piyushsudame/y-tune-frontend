@@ -15,7 +15,7 @@ importers:
         specifier: ^0.5.17
         version: 0.5.17
       algoliasearch:
-        specifier: '5'
+        specifier: 5.25.0
         version: 5.25.0
       bcryptjs:
         specifier: ^3.0.2
