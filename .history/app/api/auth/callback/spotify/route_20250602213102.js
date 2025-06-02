@@ -49,13 +49,6 @@ export async function GET(request) {
       sameSite: 'lax',
       maxAge: 30 * 24 * 60 * 60 // 30 days
     });
-
-    // Set a non-httpOnly cookie to indicate authentication state
-    response.cookies.set('spotify_authenticated', 'true', {
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 30 * 24 * 60 * 60 // 30 days
-    });
     
     return response;
   } catch (error) {

@@ -20,7 +20,7 @@ export async function GET(request) {
       body: new URLSearchParams({
         grant_type: 'authorization_code',
         code,
-        redirect_uri: `https://y-tune-frontend.vercel.app/api/auth/callback/spotify`,
+        redirect_uri: 'https://y-tune-frontend.vercel.app/api/auth/callback/spotify',
       }),
     });
 
@@ -36,7 +36,7 @@ export async function GET(request) {
     
     // Set access token cookie (1 hour)
     response.cookies.set('spotify_access_token', data.access_token, {
-      httpOnly: true,
+      httpOnly: false,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       maxAge: 3600 // 1 hour
@@ -44,14 +44,7 @@ export async function GET(request) {
     
     // Set refresh token cookie (30 days)
     response.cookies.set('spotify_refresh_token', data.refresh_token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 30 * 24 * 60 * 60 // 30 days
-    });
-
-    // Set a non-httpOnly cookie to indicate authentication state
-    response.cookies.set('spotify_authenticated', 'true', {
+      httpOnly: false,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       maxAge: 30 * 24 * 60 * 60 // 30 days
