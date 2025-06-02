@@ -11,9 +11,7 @@
   "dependencies": {
     "@clerk/nextjs": "^6.20.2",
     "@swc/helpers": "^0.5.17",
-    "algoliasearch": "5",
     "bcryptjs": "^3.0.2",
-    "js-cookie": "^3.0.5",
     "lucide-react": "^0.511.0",
     "mongodb": "^6.16.0",
     "mongoose": "^8.15.1",

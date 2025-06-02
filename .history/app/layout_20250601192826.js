@@ -9,7 +9,7 @@ import {
   SignedOut,
   UserButton,
 } from '@clerk/nextjs'
-import { SpotifyProvider } from '@/context/SpotifyContext';
+import CommandPalette from "@/components/CommandPalette"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,24 +27,27 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
+  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false)
 
   
 
   return (
     <ClerkProvider>
-      <SpotifyProvider>
-        <html lang="en">
-          <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-            <div className="relative min-h-screen flex flex-col">
-              <div className="fixed inset-0 -z-100 h-full w-full [background:radial-gradient(125%_125%_at_50%_10%,#000_40%,#63e_100%)]"></div>
-              <div className="relative z-100">
-                <Navbar />
-                {children}
-              </div>
-            </div>
-          </body>
-        </html>
-      </SpotifyProvider>
+    <html lang="en">
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <div className="relative min-h-screen flex flex-col">
+          <div className="fixed inset-0 -z-100 h-full w-full [background:radial-gradient(125%_125%_at_50%_10%,#000_40%,#63e_100%)]"></div>
+          <div className="relative z-100">
+            <Navbar />
+            {children}
+          </div>
+        </div>
+        <CommandPalette 
+          isOpen={isCommandPaletteOpen} 
+          onClose={() => setIsCommandPaletteOpen(false)} 
+        />
+      </body>
+    </html>
     </ClerkProvider>
   );
 }
