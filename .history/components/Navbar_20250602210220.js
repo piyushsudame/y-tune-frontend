@@ -90,10 +90,7 @@ const Navbar = () => {
         {/* Desktop Login/Signup */}
         <div className="hidden md:flex items-center gap-4">
           {isSignedIn ? (
-            <>
-              <SpotifyButton />
-              <UserButton afterSignOutUrl="/" />
-            </>
+            <UserButton afterSignOutUrl="/" />
           ) : (
             <>
               <SignInButton mode="modal">
@@ -111,12 +108,9 @@ const Navbar = () => {
         </div>
 
         {/* Mobile Login/Signup */}
-        <div className="md:hidden flex items-center gap-2">
+        <div className="md:hidden">
           {isSignedIn ? (
-            <>
-              <SpotifyButton />
-              <UserButton afterSignOutUrl="/" />
-            </>
+            <UserButton afterSignOutUrl="/" />
           ) : (
             <button 
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
