@@ -20,7 +20,7 @@ export default function SpotifyButton() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  console.log("isSpotifyAuthenticated: ", isSpotifyAuthenticated, "isLoading: ", isLoading)
+  console.log("isSpotifyAuthenticated: ", isSpotifyAuthenticated)
   // Show loading state while checking authentication
   if (isLoading) {
     return (
