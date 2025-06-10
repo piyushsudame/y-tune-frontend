@@ -55,6 +55,7 @@ export async function POST(request) {
     const expiresAt = new Date(Date.now() + data.expires_in * 1000);
     
     // Update the user in the database
+    console.log('[Spotify Refresh] Updating user in database...');
     const updatedUser = await User.findOneAndUpdate(
       { clerkId },
       {
@@ -65,6 +66,10 @@ export async function POST(request) {
       },
       { new: true }
     );
+    
+    if (updatedUser) {
+      console.log('[Spotify Refresh] User updated successfully');
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {

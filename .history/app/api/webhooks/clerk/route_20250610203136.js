@@ -93,8 +93,9 @@ export async function POST(req) {
           clerkId,
           isSpotifyConnected: false
         })
+        console.log('User created from session event:', clerkId)
       } catch (clerkError) {
-        console.error('Failed to fetch user from Clerk:', clerkError)
+        console.log('Failed to fetch user from Clerk:', clerkError)
       }
     }
   }

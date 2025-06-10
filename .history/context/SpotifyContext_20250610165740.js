@@ -113,7 +113,7 @@ export function SpotifyProvider({ children }) {
         setDataLoaded(prev => ({ ...prev, likedSongs: true }));
       }
     } catch (error) {
-      // Error handling
+      console.error('Error fetching liked songs:', error);
     }
   };
 
@@ -126,7 +126,7 @@ export function SpotifyProvider({ children }) {
         setDataLoaded(prev => ({ ...prev, artists: true }));
       }
     } catch (error) {
-      // Error handling
+      console.error('Error fetching top artists:', error);
     }
   };
 
@@ -145,13 +145,15 @@ export function SpotifyProvider({ children }) {
       artists: false
     });
     
+    // Clear from localStorage
     localStorage.removeItem('spotifyAuthStatus');
   }, []);
 
   const checkAuthenticationStatus = useCallback(async () => {
     try {
+      // Check if we've recently validated and the token is still valid
       const now = new Date();
-      const cacheValidityPeriod = 5 * 60 * 1000;
+      const cacheValidityPeriod = 5 * 60 * 1000; // 5 minutes in milliseconds
       
       if (
         lastChecked && 
@@ -159,18 +161,22 @@ export function SpotifyProvider({ children }) {
         (now - lastChecked) < cacheValidityPeriod && 
         now < new Date(expiresAt)
       ) {
+        // Use cached authentication status
+        console.log('Using cached authentication status');
         setIsLoading(false);
         return;
       }
       
       setIsLoading(true);
       
+      // Check authentication status from our backend
       const response = await fetch('/api/spotify/validate', {
         method: 'GET',
         credentials: 'include',
       });
 
       if (response.ok) {
+        // Parse the response to get the validation result
         const data = await response.json();
         
         if (data.valid) {
@@ -178,6 +184,7 @@ export function SpotifyProvider({ children }) {
           setLastChecked(now);
           setExpiresAt(data.expiresAt);
           
+          // Store in localStorage for persistence across page reloads
           localStorage.setItem('spotifyAuthStatus', JSON.stringify({
             isAuthenticated: true,
             lastChecked: now.toISOString(),
@@ -190,6 +197,7 @@ export function SpotifyProvider({ children }) {
         clearAuthenticationData();
       }
     } catch (error) {
+      console.error('Error checking authentication status:', error);
       clearAuthenticationData();
     } finally {
       setIsLoading(false);
@@ -197,17 +205,26 @@ export function SpotifyProvider({ children }) {
   }, [lastChecked, expiresAt, clearAuthenticationData]);
 
   useEffect(() => {
+    // Listen for URL changes (e.g., after redirect from Spotify)
     const handleUrlChange = () => {
       const urlParams = new URLSearchParams(window.location.search);
       
+      // Check for success
       if (urlParams.get('spotify_auth') === 'success') {
+        // Remove the URL parameter and refresh auth status
         window.history.replaceState({}, document.title, window.location.pathname);
         setTimeout(() => checkAuthenticationStatus(), 100);
       }
       
+      // Check for errors
       const error = urlParams.get('error');
       if (error) {
+        console.error('Spotify auth error detected in URL:', error);
         const status = urlParams.get('status');
+        if (status) {
+          console.error('Error status:', status);
+        }
+        // Clear the error from the URL
         const newUrl = new URL(window.location.href);
         newUrl.searchParams.delete('error');
         newUrl.searchParams.delete('status');
@@ -217,9 +234,10 @@ export function SpotifyProvider({ children }) {
 
     handleUrlChange();
     
+    // Only check auth on focus if we haven't checked recently
     const handleFocus = () => {
       const now = new Date();
-      const cacheValidityPeriod = 5 * 60 * 1000;
+      const cacheValidityPeriod = 5 * 60 * 1000; // 5 minutes
       
       if (!lastChecked || (now - lastChecked) > cacheValidityPeriod) {
         checkAuthenticationStatus();
@@ -233,38 +251,48 @@ export function SpotifyProvider({ children }) {
     };
   }, [lastChecked, checkAuthenticationStatus]);
 
+  
+
   const loginToSpotify = () => {
     const clientId = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID;
     if (!clientId) {
+      console.error('Spotify Client ID is not defined. Make sure NEXT_PUBLIC_SPOTIFY_CLIENT_ID is set in your .env file');
       return;
     }
 
     const redirectUri = process.env.NEXT_PUBLIC_SPOTIFY_REDIRECT_URI;
     if (!redirectUri) {
+      console.error('Spotify Redirect URI is not defined. Make sure NEXT_PUBLIC_SPOTIFY_REDIRECT_URI is set in your .env file');
       return;
     }
     
+    
+    // Use consistent scopes - match what you need for your app
     const scope = 'user-read-private user-read-email user-library-read user-top-read playlist-read-private playlist-read-collaborative user-read-playback-state user-modify-playback-state user-read-currently-playing';
     
     const authUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=code&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scope)}&show_dialog=true`;
+    
     
     window.location.href = authUrl;
   };
 
   const logoutSpotify = async () => {
     try {
+      // Call logout endpoint to clear session on the server
       await fetch('/api/spotify/logout', {
         method: 'POST',
         credentials: 'include',
       });
       clearAuthenticationData();
     } catch (error) {
+      console.error('Logout error:', error);
       clearAuthenticationData();
     }
   };
 
   const spotifyApiCall = async (endpoint, options = {}) => {
     try {
+      // Make the API call through our backend proxy
       const response = await fetch(`/api/spotify/proxy${endpoint}`, {
         ...options,
         credentials: 'include',
@@ -274,18 +302,29 @@ export function SpotifyProvider({ children }) {
         },
       });
 
+      // If we get a 401, we don't need to manually refresh the token here
+      // The proxy endpoint will handle token refreshing internally
       if (response.status === 401) {
+        // Instead of trying to refresh here, we'll check authentication status
+        // This prevents potential infinite loops
         await checkAuthenticationStatus();
         throw new Error('Authentication failed - please try again');
       }
 
       return response;
     } catch (error) {
+      console.error('Spotify API call error:', error);
       throw error;
     }
   };
 
-  const handlePlay = async (songInfo) => {
+  /**
+   * Placeholder for future song playback implementation
+   * @param {string} songName - The name of the song to play
+   * @param {Object} songInfo - Optional song metadata (title, artist, etc.)
+   */
+
+   const handlePlay = async (songInfo) => {
     try {
       const response = await fetch(`/api/get-stream-url`, {
         method: 'POST',
