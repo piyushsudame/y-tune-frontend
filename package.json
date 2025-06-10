@@ -11,6 +11,7 @@
   "dependencies": {
     "@clerk/backend": "^2.0.0",
     "@clerk/nextjs": "^6.20.2",
+    "@distube/ytdl-core": "^4.16.11",
     "@swc/helpers": "^0.5.17",
     "algoliasearch": "5.25.0",
     "bcryptjs": "^3.0.2",
@@ -26,7 +27,8 @@
     "react-resizable-panels": "^3.0.2",
     "react-toastify": "^11.0.5",
     "resend": "^4.5.1",
-    "svix": "^1.67.0"
+    "svix": "^1.67.0",
+    "ytdl-core": "^4.11.5"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

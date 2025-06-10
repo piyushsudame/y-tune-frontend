@@ -17,21 +17,14 @@ export async function searchYouTubeMusic(query){
     return data;
 }
 
-export async function getStreamUrl(id){
-    console.log('Getting stream URL for video:', id);
-    
-    // Ensure videoId is valid
-    if (!id) {
-        console.error('Invalid or missing video ID');
-        throw new Error("Invalid or missing video ID");
-    }
-    
+export async function getStreamUrl(videoId){
+    console.log('Getting stream URL for video:', videoId);
     const response = await fetch(`/api/get-stream-url`, {
         method: "POST",
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ action: 'stream', id: id })
+        body: JSON.stringify({ action: 'stream', id: videoId })
     })
     
     if(!response.ok) {

@@ -66,7 +66,7 @@ const Player = () => {
                 <div className="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
               ) : (
                 <Image 
-                  src={isPlaying ? "/paused.png" : "/playing.png"} 
+                  src={isPlaying ? "/pause.png" : "/playing.png"} 
                   alt="Play/Pause" 
                   width={32} 
                   height={32} 

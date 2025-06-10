@@ -309,16 +309,11 @@ export function SpotifyProvider({ children }) {
       
       // Get the first result's video ID
       const videoId = searchResults[0].id;
-      console.log('Video ID from search results:', videoId);
-      
-      // Prepare request body
-      const requestBody = { action: 'stream', id: videoId };
-      console.log('Request body for stream:', requestBody);
       
       // Now get the stream URL
       const streamResponse = await fetch(`/api/get-stream-url`, {
         method: 'POST',
-        body: JSON.stringify(requestBody),
+        body: JSON.stringify({ action: 'stream', id: videoId }),
         headers: { 'Content-Type': "application/json"}
       });
 
