@@ -28,8 +28,11 @@ const spotifySessionSchema = new Schema({
     default: Date.now
   }
 });
+console.log("Schema made with values:", spotifySessionSchema.obj);
 
 // Use mongoose.models to check if the model is already registered
 const SpotifySession = mongoose.models.SpotifySession || mongoose.model('SpotifySession', spotifySessionSchema);
+console.log("SpotifySession Model created successfully");
+
 export default SpotifySession;
-export { SpotifySession };
+// export { SpotifySession };
